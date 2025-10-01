@@ -4,14 +4,15 @@ import com.example.SegundoProyectoSpringMySQL.entities.Categoria;
 import com.example.SegundoProyectoSpringMySQL.entities.Mensaje;
 import com.example.SegundoProyectoSpringMySQL.repositories.CategoriaRepository;
 import com.example.SegundoProyectoSpringMySQL.repositories.MensajeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class MensajeController {
 
     //@Autowired no es necesario indicar aquí esta anotación poque los hemos puesto como parámetros del constructor
@@ -50,23 +51,39 @@ public class MensajeController {
 
 
     @GetMapping("/mensajes")
-    public List<Mensaje> findAllMensajes(){
+    public List<Mensaje> findAllMensajes() {
         return mensajeRepository.findAll();
     }
 
     @GetMapping("/mensajes/{id}")
-    public Mensaje findMensajes(){
-        return new Mensaje();
+    public ResponseEntity<Mensaje> findMensajes(@PathVariable Long id){
+        return mensajeRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/mensajes/{id}")
-    public Mensaje removeMensajes(){
-        return new Mensaje();
+    public ResponseEntity<Void> removeMensajes(@PathVariable Long id) {
+        if (!mensajeRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        mensajeRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
-
+    
     @PutMapping("/mensajes/{id}")
-    public Mensaje editMensajes(@RequestBody Mensaje mensaje){
-        return new Mensaje();
+    public ResponseEntity<Mensaje>  editMensajes(@RequestBody Mensaje mensaje, @PathVariable Long id){
+        return mensajeRepository.findById(id)
+                .map(m -> {
+                    m.setCategoria(mensaje.getCategoria());
+                    m.setId(mensaje.getId());
+                    m.setTitulo(mensaje.getTitulo());
+                    m.setTexto(mensaje.getTexto());
+                    m.setFechaCreacion(mensaje.getFechaCreacion());
+                    Mensaje mensajeActualizado = mensajeRepository.save(m);
+                    return ResponseEntity.ok(mensajeActualizado);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/mensajes")
