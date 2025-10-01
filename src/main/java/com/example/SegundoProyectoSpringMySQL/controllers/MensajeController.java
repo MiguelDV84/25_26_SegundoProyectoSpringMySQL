@@ -5,6 +5,8 @@ import com.example.SegundoProyectoSpringMySQL.entities.Mensaje;
 import com.example.SegundoProyectoSpringMySQL.repositories.CategoriaRepository;
 import com.example.SegundoProyectoSpringMySQL.repositories.MensajeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,7 +89,12 @@ public class MensajeController {
     }
 
     @PostMapping("/mensajes")
-    public Mensaje insertMensajes(@RequestBody Mensaje mensaje){
-        return new Mensaje();
+    public ResponseEntity<Mensaje> insertMensajes(@RequestBody Mensaje mensaje){
+        mensaje.setId(null);
+
+        Mensaje saved = mensajeRepository.save(mensaje);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
     }
 }
