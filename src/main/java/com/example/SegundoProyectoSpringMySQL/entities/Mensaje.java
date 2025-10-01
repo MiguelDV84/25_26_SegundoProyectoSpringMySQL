@@ -1,7 +1,10 @@
 package com.example.SegundoProyectoSpringMySQL.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -22,8 +25,10 @@ public class Mensaje {
 
     private String texto;
 
+    @CreationTimestamp
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
+
 
     @ManyToOne
     private Categoria categoria;

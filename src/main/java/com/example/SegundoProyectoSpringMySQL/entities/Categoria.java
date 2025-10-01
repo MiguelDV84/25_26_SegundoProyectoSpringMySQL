@@ -1,5 +1,6 @@
 package com.example.SegundoProyectoSpringMySQL.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +15,7 @@ public class Categoria {
 
     private String nombreCategoria;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "categoria", cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     private List<Mensaje> mensajes;
 }
