@@ -29,7 +29,6 @@ public class Mensaje {
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
 
-
     @ManyToOne
     private Categoria categoria;
 }

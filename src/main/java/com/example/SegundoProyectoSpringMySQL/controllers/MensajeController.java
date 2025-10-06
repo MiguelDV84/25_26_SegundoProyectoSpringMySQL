@@ -1,55 +1,26 @@
 package com.example.SegundoProyectoSpringMySQL.controllers;
 
-import com.example.SegundoProyectoSpringMySQL.entities.Categoria;
 import com.example.SegundoProyectoSpringMySQL.entities.Mensaje;
 import com.example.SegundoProyectoSpringMySQL.repositories.CategoriaRepository;
 import com.example.SegundoProyectoSpringMySQL.repositories.MensajeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.time.LocalDateTime;
+import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class MensajeController {
+public class MensajeController  {
 
-    //@Autowired no es necesario indicar aquí esta anotación poque los hemos puesto como parámetros del constructor
+    @Autowired
     MensajeRepository mensajeRepository;
+    @Autowired
     CategoriaRepository categoriaRepository;
-
-    //Inyectamos los repositorios en el constructor, así Spring los crea y gestiona automáticamente).
-    public MensajeController(CategoriaRepository categoriaRepository, MensajeRepository mensajeRepository){
-
-        //Para poder acceder desde otros métodos lo asigno a la propiedad de la clase
-        this.mensajeRepository = mensajeRepository;
-        this.categoriaRepository = categoriaRepository;
-
-        Categoria categoria = Categoria.builder()
-                .nombreCategoria("Móviles")
-                .mensajes(List.of(
-                        Mensaje.builder()
-                                .titulo("Primer post sobre móviles")
-                                .texto("Este es el texto del primer post")
-                                .fechaCreacion(LocalDateTime.now())
-                                .build(),
-                        Mensaje.builder()
-                                .titulo("Segundo post sobre móviles")
-                                .texto("Este es el texto del segundo post")
-                                .fechaCreacion(LocalDateTime.now())
-                                .build()
-                ))
-                .build();
-
-        categoria.getMensajes().forEach(
-                mensaje -> mensaje.setCategoria(categoria)
-        );
-
-        categoriaRepository.save(categoria);
-    }
 
 
     @GetMapping("/mensajes")
@@ -89,12 +60,16 @@ public class MensajeController {
     }
 
     @PostMapping("/mensajes")
-    public ResponseEntity<Mensaje> insertMensajes(@RequestBody Mensaje mensaje){
-        mensaje.setId(null);
-
+    public ResponseEntity<Mensaje> insertMensajes(@RequestBody Mensaje mensaje) {
         Mensaje saved = mensajeRepository.save(mensaje);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        URI uriMensaje = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
 
+        return ResponseEntity.created(uriMensaje).body(saved);
     }
+
 }
