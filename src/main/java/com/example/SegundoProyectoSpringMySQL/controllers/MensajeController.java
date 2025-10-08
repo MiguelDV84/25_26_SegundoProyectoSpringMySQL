@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,8 +20,6 @@ public class MensajeController  {
 
     @Autowired
     MensajeRepository mensajeRepository;
-    @Autowired
-    CategoriaRepository categoriaRepository;
 
 
     @GetMapping("/mensajes")
@@ -49,10 +48,8 @@ public class MensajeController  {
         return mensajeRepository.findById(id)
                 .map(m -> {
                     m.setCategoria(mensaje.getCategoria());
-                    m.setId(mensaje.getId());
                     m.setTitulo(mensaje.getTitulo());
                     m.setTexto(mensaje.getTexto());
-                    m.setFechaCreacion(mensaje.getFechaCreacion());
                     Mensaje mensajeActualizado = mensajeRepository.save(m);
                     return ResponseEntity.ok(mensajeActualizado);
                 })
